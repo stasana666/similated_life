@@ -3,7 +3,7 @@ project(simulated_life)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(simulated_life main.cpp)
+add_executable(simulated_life main.cpp World.cpp World.h Blocks.cpp Blocks.h Agent.cpp Agent.h Brain.cpp Brain.h Random.cpp Random.h Textures.cpp Textures.h)
 
 include_directories(c:/SFML/include)
 

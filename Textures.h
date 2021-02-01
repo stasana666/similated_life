@@ -1,14 +1,14 @@
-//
-// Created by Stasana on 31.01.2021.
-//
-
-#ifndef SIMULATED_LIFE_TEXTURES_H
-#define SIMULATED_LIFE_TEXTURES_H
-
+#include <SFML/Graphics.hpp>
+#include <memory>
 
 class Textures {
+public:
+    static std::unique_ptr<sf::RenderTexture> empty;
+    static std::unique_ptr<sf::RenderTexture> agent;
+    static std::unique_ptr<sf::RenderTexture> food;
 
+private:
+    static int getTextureWidth();
+
+    static int getTextureHeight();
 };
-
-
-#endif //SIMULATED_LIFE_TEXTURES_H
