@@ -28,6 +28,8 @@ public:
 
     int getFood();
 
+    void addFood();
+
     Agent* getAnyAgent();
 
 private:

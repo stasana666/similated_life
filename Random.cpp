@@ -6,3 +6,7 @@ double Random::get_random_double() {
     return static_cast<double>(rng() - std::mt19937::min())
          / static_cast<double>(std::mt19937::max() - std::mt19937::min());
 }
+
+int Random::get_random_index(int n) {
+    return rng() % n;
+}

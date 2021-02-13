@@ -1,12 +1,28 @@
 #include "Agent.h"
 
-Agent::Agent(Block* block, int color)
+Agent::Agent(int color)
     : direction(0)
     , brain()
     , health(1)
     , have_food(false)
     , color(color)
-    , block(block) {
+    , block(nullptr) {
+}
+
+Agent::Agent(const Agent &other)
+        : direction(0)
+        , brain(other.brain)
+        , health(1)
+        , have_food(false)
+        , color(other.color)
+        , block(nullptr) {
+}
+
+void Agent::bindTo(Block* block) {
+    if (this->block) {
+        throw std::runtime_error("agent already binded");
+    }
+    this->block = block;
     block->addAgent(this);
 }
 
@@ -58,6 +74,7 @@ void Agent::doSomething() {
             break;
         case AgentAction::Eat:
             if (!have_food) {
+                energy -= 0.5;
                 break;
             }
             energy += 0.5;
@@ -96,9 +113,15 @@ bool Agent::isEnemy(Agent *other) const {
 }
 
 Agent::~Agent() {
-    block->deleteAgent(this);
+    if (block) {
+        block->deleteAgent(this);
+    }
 }
 
 bool Agent::isDead() const {
     return health <= 0;
+}
+
+void Agent::mutation(double radiation) {
+    brain.mutation(radiation);
 }

@@ -28,6 +28,12 @@ void Neuron::setSignal(double value) {
     signal = value;
 }
 
+void Neuron::mutation(double radiation) {
+    for (auto& synapse : synapses) {
+        synapse.weight += (Random::get_random_double() - 0.5) * radiation;
+    }
+}
+
 Neuron::Synapse::Synapse(Neuron *target, double weight)
     : target(target)
     , weight(weight) {
@@ -70,7 +76,7 @@ void NeuronLayer::bindTo(const shared_ptr<NeuronLayer>& target) {
 
 void NeuronLayer::add() {
     layer.emplace_back();
-    if (next_layer != nullptr) {
+    if (next_layer) {
         for (auto& neuron : next_layer->layer) {
             layer.back().bindTo(&neuron);
         }
@@ -92,6 +98,33 @@ vector<double> NeuronLayer::get() const {
         result.emplace_back(neuron.getSignal());
     }
     return result;
+}
+
+NeuronLayer::NeuronLayer(const NeuronLayer &other)
+    : next_layer(nullptr) {
+    bias.setSignal(1);
+    if (other.next_layer) {
+        bindTo(make_shared<NeuronLayer>(*other.next_layer));
+        for (size_t i = 0; i < other.layer.size(); ++i) {
+            add();
+            for (size_t j = 0; j < layer[i].synapses.size(); ++j) {
+                layer[i].synapses[j].weight = other.layer[i].synapses[j].weight;
+            }
+        }
+        for (size_t i = 0; i < bias.synapses.size(); ++i) {
+            bias.synapses[i].weight = other.bias.synapses[i].weight;
+        }
+    } else {
+        for (size_t i = 0; i < other.layer.size(); ++i) {
+            add();
+        }
+    }
+}
+
+void NeuronLayer::mutation(double radiation) {
+    for (auto& neuron : layer) {
+        neuron.mutation(radiation);
+    }
 }
 
 NeuronNetwork::NeuronNetwork(const std::vector<int> &size_of_levels) {
@@ -126,6 +159,22 @@ void NeuronNetwork::forwardPropagation() {
 
 std::vector<double> NeuronNetwork::get() const {
     return output->get();
+}
+
+NeuronNetwork::NeuronNetwork(const NeuronNetwork &other) {
+    input = make_shared<NeuronLayer>(*other.input);
+    output = input;
+    while (output->next_layer) {
+        output = output->next_layer;
+    }
+}
+
+void NeuronNetwork::mutation(double radiation) {
+    auto ptr = input;
+    while (ptr != output) {
+        ptr->mutation(radiation);
+        ptr = ptr->next_layer;
+    }
 }
 
 Brain::Brain()
@@ -170,6 +219,10 @@ AgentAction Brain::getAction(const BrainInput& params) {
 
 int Brain::getMemorySize() {
     return 10;
+}
+
+void Brain::mutation(double radiation) {
+    network.mutation(radiation);
 }
 
 int BrainInput::getParamsCount() {

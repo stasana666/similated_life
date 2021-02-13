@@ -15,10 +15,13 @@ public:
     void update();
 
 private:
+    void generateFood();
+
     int width;
     int height;
     std::vector<std::vector<Block>> area;
     std::vector<std::unique_ptr<Agent>> agents;
+    std::vector<std::unique_ptr<Agent>> dead_agents;
     mutable sf::RenderTexture texture;
     mutable std::mutex render_mutex;
 };

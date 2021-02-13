@@ -76,3 +76,8 @@ Block::Block()
     , food(0) {
     updateTexture();
 }
+
+void Block::addFood() {
+    ++food;
+    updateTexture();
+}

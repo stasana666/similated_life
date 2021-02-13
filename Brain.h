@@ -46,6 +46,8 @@ public:
 
     void setSignal(double value);
 
+    void mutation(double radiation);
+
 private:
 
     static double func(double x);
@@ -59,11 +61,15 @@ private:
 
     std::vector<Synapse> synapses;
     double signal;
+
+    friend class NeuronLayer;
 };
 
 class NeuronLayer {
 public:
     NeuronLayer();
+
+    NeuronLayer(const NeuronLayer& other);
 
     void forwardPropagation();
 
@@ -77,19 +83,27 @@ public:
 
     [[nodiscard]] std::vector<double> get() const;
 
+    void mutation(double radiation);
+
 private:
     std::shared_ptr<NeuronLayer> next_layer;
     std::vector<Neuron> layer;
     Neuron bias;
+
+    friend class NeuronNetwork;
 };
 
 class NeuronNetwork {
 public:
     explicit NeuronNetwork(const std::vector<int>& size_of_levels);
 
+    NeuronNetwork(const NeuronNetwork& other);
+
     void set(const std::vector<double>& values);
 
     void forwardPropagation();
+
+    void mutation(double radiation);
 
     [[nodiscard]] std::vector<double> get() const;
 
@@ -106,6 +120,8 @@ public:
     Brain(const Brain& other);
 
     AgentAction getAction(const BrainInput& input);
+
+    void mutation(double radiation);
 
 private:
     static int getMemorySize();

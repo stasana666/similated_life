@@ -7,6 +7,8 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "simulated_life");
     World world(30, 30);
 
+    int cnt = 100'000;
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -15,14 +17,19 @@ int main() {
             }
         }
 
-        window.clear(sf::Color::Black);
+        if (cnt < 0) {
+            window.clear(sf::Color::Black);
 
-        window.draw(world.getSprite(600, 600));
-        world.update();
+            window.draw(world.getSprite(600, 600));
+            world.update();
 
-        sf::sleep(sf::seconds(0.3f));
+            sf::sleep(sf::seconds(0.2f));
 
-        window.display();
+            window.display();
+        } else {
+            --cnt;
+            world.update();
+        }
     }
     return 0;
 }

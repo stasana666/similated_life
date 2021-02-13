@@ -6,7 +6,9 @@
 class Agent {
 public:
 
-    explicit Agent(Block* block, int color = 0);
+    explicit Agent(int color = 0);
+
+    Agent(const Agent& other);
 
     ~Agent();
 
@@ -14,11 +16,15 @@ public:
 
     [[nodiscard]] bool isDead() const;
 
+    void bindTo(Block *block);
+
     void doSomething();
 
     bool isFriend(Agent* other) const;
 
     bool isEnemy(Agent* other) const;
+
+    void mutation(double radiation);
 
 private:
     int direction;

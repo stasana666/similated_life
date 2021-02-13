@@ -1,5 +1,7 @@
 #include "World.h"
+#include "Random.h"
 #include <iostream>
+#include <iterator>
 
 using namespace std;
 
@@ -29,7 +31,19 @@ World::World(int width, int height)
     }
     for (int x = 2; x < width; x += 5) {
         for (int y = 2; y < height; y += 5) {
-            agents.emplace_back(make_unique<Agent>(&(area[x][y])));
+            agents.emplace_back(make_unique<Agent>());
+            agents.back()->bindTo(&(area[x][y]));
+        }
+    }
+    generateFood();
+}
+
+void World::generateFood() {
+    for (auto& x : area) {
+        for (auto& y : x) {
+            if (Random::get_random_double() < 0.05) {
+                y.addFood();
+            }
         }
     }
 }
@@ -54,9 +68,33 @@ sf::Sprite World::getSprite(int sprite_width, int sprite_height) const {
 }
 
 void World::update() {
+    if (agents.empty()) {
+        for (int x = 2; x < width; x += 5) {
+            for (int y = 2; y < height; y += 5) {
+                if ((x + y) % 2) {
+                agents.push_back(make_unique<Agent>());
+                } else {
+                    int id = 0;
+                    for (int i = 0; i < 2; ++i) {
+                        id = max(id, Random::get_random_index(dead_agents.size()));
+                    }
+                    agents.push_back(make_unique<Agent>(*dead_agents[id]));
+                    agents.back()->mutation(0.01);
+                }
+                agents.back()->bindTo(&(area[x][y]));
+            }
+        }
+        dead_agents.clear();
+        return;
+    }
     for (auto& agent : agents) {
         if (agent->isAlive()) {
             agent->doSomething();
+        }
+    }
+    for (auto& i : agents) {
+        if (i->isDead()) {
+            dead_agents.push_back(make_unique<Agent>(*i));
         }
     }
     auto it = remove_if(agents.begin(), agents.end(), [](unique_ptr<Agent>& x) {
