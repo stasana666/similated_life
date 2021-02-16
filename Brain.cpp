@@ -13,7 +13,7 @@ void Neuron::forwardPropagation() {
 }
 
 void Neuron::bindTo(Neuron *target) {
-    synapses.emplace_back(target, Random::get_random_double());
+    synapses.emplace_back(target, 10 * Random::get_random_double() - 5);
 }
 
 double Neuron::func(double x) {
@@ -30,7 +30,9 @@ void Neuron::setSignal(double value) {
 
 void Neuron::mutation(double radiation) {
     for (auto& synapse : synapses) {
-        synapse.weight += (Random::get_random_double() - 0.5) * radiation;
+        if (Random::get_random_double() < radiation) {
+            synapse.weight += (Random::get_random_double() - 0.5) * 2;
+        }
     }
 }
 
@@ -179,7 +181,6 @@ void NeuronNetwork::mutation(double radiation) {
 
 Brain::Brain()
     : network({BrainInput::getParamsCount() + getMemorySize(),
-               10,
                static_cast<int>(AgentAction::LastElement) + getMemorySize()})
     , memory(getMemorySize()) {
 }
@@ -218,7 +219,7 @@ AgentAction Brain::getAction(const BrainInput& params) {
 }
 
 int Brain::getMemorySize() {
-    return 10;
+    return 2;
 }
 
 void Brain::mutation(double radiation) {
@@ -226,21 +227,19 @@ void Brain::mutation(double radiation) {
 }
 
 int BrainInput::getParamsCount() {
-    return 16;
+    return 13;
 }
 
 std::vector<double> BrainInput::getInput() const {
     vector<double> result;
 
-    for (int dir = 0; dir < 4; ++dir) {
+    for (int dir = 0; dir < 5; ++dir) {
         result.emplace_back(area[dir].is_enemy);
         result.emplace_back(area[dir].is_food);
-        result.emplace_back(area[dir].is_friend);
     }
 
     result.emplace_back(have_i_food);
     result.emplace_back(my_health);
-    result.emplace_back(is_there_food);
     result.emplace_back(energy);
 
     return result;

@@ -1,13 +1,14 @@
 #include <SFML/Graphics.hpp>
 #include "World.h"
+#include <iostream>
 
 using namespace std;
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "simulated_life");
-    World world(30, 30);
+    sf::RenderWindow window(sf::VideoMode(800, 800), "simulated_life");
+    World world(80, 80);
 
-    int cnt = 100'000;
+    int cnt = 1'000'000;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -17,17 +18,21 @@ int main() {
             }
         }
 
+        if (cnt >= 0 && cnt % 10'000 == 0) {
+            cout << 100 - cnt / 10'000 << "%" << endl;
+        }
+
+        --cnt;
         if (cnt < 0) {
             window.clear(sf::Color::Black);
 
-            window.draw(world.getSprite(600, 600));
+            window.draw(world.getSprite(800, 800));
             world.update();
 
-            sf::sleep(sf::seconds(0.2f));
+            sf::sleep(sf::seconds(0.05f));
 
             window.display();
         } else {
-            --cnt;
             world.update();
         }
     }

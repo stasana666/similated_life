@@ -22,6 +22,8 @@ private:
     std::vector<std::vector<Block>> area;
     std::vector<std::unique_ptr<Agent>> agents;
     std::vector<std::unique_ptr<Agent>> dead_agents;
+    std::vector<double> lifetime;
+    int time_of_age;
     mutable sf::RenderTexture texture;
     mutable std::mutex render_mutex;
 };

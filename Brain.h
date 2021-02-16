@@ -17,15 +17,13 @@ enum class AgentAction {
 
 struct DirectionParams {
     bool is_food    = false;
-    bool is_friend  = false;
     bool is_enemy   = false;
 };
 
 class BrainInput {
 public:
-    std::array<DirectionParams, 4> area;
+    std::array<DirectionParams, 5> area;
 
-    bool is_there_food = false;
     bool have_i_food = false;
     double my_health = 1;
     double energy = 1;

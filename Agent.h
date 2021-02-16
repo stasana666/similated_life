@@ -20,13 +20,10 @@ public:
 
     void doSomething();
 
-    bool isFriend(Agent* other) const;
-
-    bool isEnemy(Agent* other) const;
-
     void mutation(double radiation);
 
 private:
+public:
     int direction;
     Brain brain;
     double health;

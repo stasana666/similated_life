@@ -49,9 +49,9 @@ std::unique_ptr<sf::RenderTexture> Textures::food = []() {
 }();
 
 int Textures::getTextureWidth() {
-    return 20;
+    return 10;
 }
 
 int Textures::getTextureHeight() {
-    return 20;
+    return 10;
 }

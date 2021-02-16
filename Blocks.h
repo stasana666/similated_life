@@ -20,13 +20,13 @@ public:
 
     [[nodiscard]] sf::Sprite getSprite() const;
 
-    bool hasFriend(Agent* agent) const;
-
-    bool hasEnemy(Agent* agent) const;
+    [[nodiscard]] bool hasEnemy() const;
 
     [[nodiscard]] bool hasFood() const;
 
     int getFood();
+
+    void removeFood();
 
     void addFood();
 

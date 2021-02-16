@@ -8,7 +8,8 @@ using namespace std;
 World::World(int width, int height)
     : width(width)
     , height(height)
-    , area(width, vector<Block>(height)){
+    , area(width, vector<Block>(height))
+    , time_of_age(0) {
     for (int x = 0; x < width; ++x) {
         for (int y = 0; y < height; ++y) {
             array<int, 4> dx = {1, 0, -1, 0};
@@ -41,7 +42,8 @@ World::World(int width, int height)
 void World::generateFood() {
     for (auto& x : area) {
         for (auto& y : x) {
-            if (Random::get_random_double() < 0.05) {
+            y.removeFood();
+            if (Random::get_random_double() < 0.95) {
                 y.addFood();
             }
         }
@@ -69,23 +71,38 @@ sf::Sprite World::getSprite(int sprite_width, int sprite_height) const {
 
 void World::update() {
     if (agents.empty()) {
-        for (int x = 2; x < width; x += 5) {
-            for (int y = 2; y < height; y += 5) {
-                if ((x + y) % 2) {
-                agents.push_back(make_unique<Agent>());
+        generateFood();
+        double sum_lifetime = 0;
+        for (auto i : lifetime) {
+            sum_lifetime += i;
+        }
+        for (int x = 2; x < width; x += 3) {
+            for (int y = 2; y < height; y += 3) {
+                if (Random::get_random_double() < 0.7) {
+                    agents.push_back(make_unique<Agent>());
                 } else {
+                    double sum = Random::get_random_double() * sum_lifetime - 0.1;
                     int id = 0;
-                    for (int i = 0; i < 2; ++i) {
-                        id = max(id, Random::get_random_index(dead_agents.size()));
+                    while (sum > lifetime[id]) {
+                        sum -= lifetime[id];
+                        ++id;
                     }
                     agents.push_back(make_unique<Agent>(*dead_agents[id]));
-                    agents.back()->mutation(0.01);
+                    agents.back()->mutation(0.04);
                 }
                 agents.back()->bindTo(&(area[x][y]));
             }
         }
         dead_agents.clear();
+        lifetime.clear();
+        time_of_age = 0;
         return;
+    }
+    ++time_of_age;
+    if (time_of_age > 1000) {
+        cerr << "kek: " << time_of_age << endl;
+        cerr << agents[0]->health << endl;
+        cerr << agents[0]->energy << endl;
     }
     for (auto& agent : agents) {
         if (agent->isAlive()) {
@@ -95,6 +112,7 @@ void World::update() {
     for (auto& i : agents) {
         if (i->isDead()) {
             dead_agents.push_back(make_unique<Agent>(*i));
+            lifetime.push_back(time_of_age * time_of_age);
         }
     }
     auto it = remove_if(agents.begin(), agents.end(), [](unique_ptr<Agent>& x) {

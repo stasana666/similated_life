@@ -29,16 +29,8 @@ Block *Block::getNeighbour(int direction) {
     return neighbours[direction];
 }
 
-bool Block::hasFriend(Agent* agent) const {
-    return std::any_of(agents.begin(), agents.end(), [agent](auto i) {
-        return i->isFriend(agent);
-    });
-}
-
-bool Block::hasEnemy(Agent *agent) const {
-    return std::any_of(agents.begin(), agents.end(), [agent](auto i) {
-        return i->isEnemy(agent);
-    });
+bool Block::hasEnemy() const {
+    return !agents.empty();
 }
 
 bool Block::hasFood() const {
@@ -46,7 +38,7 @@ bool Block::hasFood() const {
 }
 
 int Block::getFood() {
-    if (food == 0) {
+    if (food <= 0) {
         return 0;
     }
     --food;
@@ -79,5 +71,10 @@ Block::Block()
 
 void Block::addFood() {
     ++food;
+    updateTexture();
+}
+
+void Block::removeFood() {
+    food = 0;
     updateTexture();
 }

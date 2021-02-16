@@ -1,11 +1,12 @@
 #include "Agent.h"
+#include <iostream>
 
 Agent::Agent(int color)
     : direction(0)
     , brain()
     , health(1)
+    , energy(1)
     , have_food(false)
-    , color(color)
     , block(nullptr) {
 }
 
@@ -13,8 +14,8 @@ Agent::Agent(const Agent &other)
         : direction(0)
         , brain(other.brain)
         , health(1)
+        , energy(1)
         , have_food(false)
-        , color(other.color)
         , block(nullptr) {
 }
 
@@ -47,10 +48,14 @@ void Agent::doSomething() {
     for (int dir = 0; dir < 4; ++dir) {
         Block* near_block = block->getNeighbour(mod(direction + dir, 4));
         DirectionParams direction_params;
-        direction_params.is_friend   = near_block->hasFriend(this);
-        direction_params.is_enemy    = near_block->hasEnemy(this);
+        direction_params.is_enemy    = near_block->hasEnemy();
         direction_params.is_food     = near_block->hasFood();
         input.area[dir] = direction_params;
+    }
+    {   // area: this->block
+        DirectionParams direction_params;
+        input.area[4].is_enemy = block->hasEnemy();
+        input.area[4].is_food = block->hasFood();
     }
     input.have_i_food = have_food;
     input.my_health = health;
@@ -74,10 +79,12 @@ void Agent::doSomething() {
             break;
         case AgentAction::Eat:
             if (!have_food) {
-                energy -= 0.5;
+                energy -= 0.025;
                 break;
             }
-            energy += 0.5;
+            energy += 0.25;
+            have_food = false;
+            break;
         case AgentAction::Move:
             energy -= 0.075;
             {
@@ -89,27 +96,22 @@ void Agent::doSomething() {
             }
             break;
         case AgentAction::Bite:
-            energy -= 0.09;
+            energy -= 0.075;
             {
                 Block* target_block = block->getNeighbour(direction);
                 Agent* target = target_block->getAnyAgent();
                 if (target != nullptr) {
                     target->health -= 0.1;
+                    if (target->isDead()) {
+                        have_food = true;
+                    }
                 }
             }
             break;
         case AgentAction::Stay:
-            energy -= 0.025;
+            energy -= 0.1;
             break;
     }
-}
-
-bool Agent::isFriend(Agent *other) const {
-    return color == other->color;
-}
-
-bool Agent::isEnemy(Agent *other) const {
-    return color != other->color;
 }
 
 Agent::~Agent() {
