@@ -3,23 +3,35 @@
 #include <iostream>
 
 using namespace std;
+using namespace sf;
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 800), "simulated_life");
+    RenderWindow window(VideoMode(800, 800), "simulated_life");
     World world(80, 80);
 
-    int cnt = 1'000'000;
+    const int START_CNT = 100'000;
+    bool isSpacePressed = false;
+    int cnt = -1;
 
     while (window.isOpen()) {
-        sf::Event event;
+        Event event;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
+            if (event.type == Event::Closed) {
                 window.close();
             }
         }
 
-        if (cnt >= 0 && cnt % 10'000 == 0) {
-            cout << 100 - cnt / 10'000 << "%" << endl;
+        if (Keyboard::isKeyPressed(Keyboard::Space)) {
+            isSpacePressed = true;
+        } else {
+            if (isSpacePressed) {
+                isSpacePressed = false;
+                cnt = START_CNT;
+            }
+        }
+
+        if (cnt >= 0 && cnt % (START_CNT / 100) == 0) {
+            cout << 100 - cnt / (START_CNT / 100) << "%" << endl;
         }
 
         --cnt;
@@ -29,7 +41,7 @@ int main() {
             window.draw(world.getSprite(800, 800));
             world.update();
 
-            sf::sleep(sf::seconds(0.05f));
+            sleep(seconds(0.1f));
 
             window.display();
         } else {

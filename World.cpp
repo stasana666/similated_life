@@ -43,7 +43,7 @@ void World::generateFood() {
     for (auto& x : area) {
         for (auto& y : x) {
             y.removeFood();
-            if (Random::get_random_double() < 0.95) {
+            if (Random::get_random_double() < 0.9) {
                 y.addFood();
             }
         }
@@ -76,8 +76,8 @@ void World::update() {
         for (auto i : lifetime) {
             sum_lifetime += i;
         }
-        for (int x = 2; x < width; x += 3) {
-            for (int y = 2; y < height; y += 3) {
+        for (int x = 2; x < width; x += 5) {
+            for (int y = 2; y < height; y += 5) {
                 if (Random::get_random_double() < 0.7) {
                     agents.push_back(make_unique<Agent>());
                 } else {
@@ -99,11 +99,6 @@ void World::update() {
         return;
     }
     ++time_of_age;
-    if (time_of_age > 1000) {
-        cerr << "kek: " << time_of_age << endl;
-        cerr << agents[0]->health << endl;
-        cerr << agents[0]->energy << endl;
-    }
     for (auto& agent : agents) {
         if (agent->isAlive()) {
             agent->doSomething();

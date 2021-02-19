@@ -23,7 +23,6 @@ public:
     void mutation(double radiation);
 
 private:
-public:
     int direction;
     Brain brain;
     double health;
